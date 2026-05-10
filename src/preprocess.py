@@ -1,5 +1,7 @@
 """
 Preprocessing pipeline for SaYoPillow stress detection dataset.
+Dataset: 630 samples, 8 physiological features, 5-class stress target (0–4).
+Reference: Rachakonda et al., IEEE Transactions on Consumer Electronics, 2021.
 """
 
 import os
@@ -9,13 +11,20 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
+# ── Column names in the raw CSV ──────────────────────────────────────────────
+# sr  = snoring rate          rr  = respiration rate
+# t   = body temperature (F)  lm  = limb movement rate
+# bo  = blood oxygen (%)      rem = rapid eye movement
+# sr.1 (renamed → sh) = sleeping hours   hr = heart rate (BPM)
+# sl  = stress level (target, 0–4)
+
 FEATURE_COLS = ["sr", "rr", "t", "lm", "bo", "rem", "sh", "hr"]
 TARGET_COL = "sl"
 
 FEATURE_DISPLAY = {
     "sr": "Snoring Rate",
     "rr": "Respiration Rate",
-    "t": "Body Temperature (F)",
+    "t": "Body Temperature (°F)",
     "lm": "Limb Movement Rate",
     "bo": "Blood Oxygen (%)",
     "rem": "Eye Movement (REM)",
@@ -39,6 +48,7 @@ STRESS_COLORS = {
     4: "#c1121f",
 }
 
+# (min, max, default, step) for Streamlit sliders
 FEATURE_RANGES = {
     "sr": (40.0, 100.0, 65.0, 0.5),
     "rr": (14.0, 30.0, 20.0, 0.5),
@@ -50,21 +60,28 @@ FEATURE_RANGES = {
     "hr": (50.0, 95.0, 70.0, 1.0),
 }
 
-DATASET_URL = "https://raw.githubusercontent.com/krishujeniya/stress-level-prediction/main/data/SaYoPillow.csv"
+DATASET_URL = (
+    "https://raw.githubusercontent.com/krishujeniya/"
+    "stress-level-prediction/main/data/SaYoPillow.csv"
+)
+
 
 def _ensure_dataset(path: str) -> None:
+    """Download SaYoPillow.csv from GitHub if not present locally."""
     if os.path.exists(path):
         return
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     try:
         urllib.request.urlretrieve(DATASET_URL, path)
     except Exception as exc:
         raise RuntimeError(
-            f"Dataset not found at {path} and auto-download failed. "
-            f"Please download SaYoPillow.csv manually from Kaggle and place it in {os.path.dirname(path)}/"
+            f"Dataset not found at {path} and auto-download failed.\n"
+            f"Please place SaYoPillow.csv in {os.path.dirname(path)}/"
         ) from exc
 
+
 def _normalise_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Standardise column names to short-form keys."""
     df.columns = [c.strip().lower() for c in df.columns]
     rename_map = {}
     for old, new in {
@@ -85,7 +102,18 @@ def _normalise_columns(df: pd.DataFrame) -> pd.DataFrame:
         df = df.rename(columns=rename_map)
     return df
 
-def load_and_prepare(path: str, test_size: float = 0.2, random_state: int = 42) -> dict:
+
+def load_and_prepare(
+    path: str,
+    test_size: float = 0.2,
+    random_state: int = 42,
+) -> dict:
+    """
+    Load CSV → normalise → clean → scale → split.
+
+    Returns dict with keys:
+        df, X_scaled, y, X_train, X_test, y_train, y_test, scaler
+    """
     _ensure_dataset(path)
     df = pd.read_csv(path)
     df = _normalise_columns(df)

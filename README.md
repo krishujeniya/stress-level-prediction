@@ -1,105 +1,83 @@
 # Stress Level Prediction
 
-Five-class physiological stress classifier.  
-Dataset: SaYoPillow — Rachakonda et al., IEEE TCE 2021.  
-Kaggle reference: https://www.kaggle.com/code/krishujeniya/stress-level-prediction
+Five-class physiological stress classifier trained on biosignals captured during sleep.
 
----
+**Dataset**: [SaYoPillow](https://www.kaggle.com/datasets/laavanya/stress-level-prediction) — Rachakonda et al., IEEE Transactions on Consumer Electronics, 2021
 
-## Setup
+## Features
 
-### 1. Get the dataset
+| Code | Feature | Unit |
+|------|---------|------|
+| `sr` | Snoring Rate | — |
+| `rr` | Respiration Rate | breaths/min |
+| `t` | Body Temperature | °F |
+| `lm` | Limb Movement Rate | — |
+| `bo` | Blood Oxygen | % |
+| `rem` | Eye Movement (REM) | — |
+| `sh` | Hours of Sleep | hours |
+| `hr` | Heart Rate | BPM |
 
-Download `SaYoPillow.csv` from Kaggle:  
-https://www.kaggle.com/datasets/laavanya/human-stress-detection-in-and-through-sleep
-
-Place it at:
-```
-data/SaYoPillow.csv
-```
-
-### 2. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run locally
-
-```bash
-streamlit run app.py
-```
-
----
-
-## Deploy to Streamlit Cloud
-
-1. Push this entire repository to GitHub (public or private).
-2. Go to https://share.streamlit.io → New app.
-3. Set:
-   - Repository: your repo
-   - Branch: main
-   - Main file path: `app.py`
-4. Click Deploy.
-
-The `requirements.txt` handles CPU-only PyTorch automatically.
-
----
-
-## File Structure
-
-```
-stress-level-prediction/
-├── app.py                    Streamlit entry point
-├── requirements.txt
-├── data/
-│   └── SaYoPillow.csv        Dataset (download from Kaggle)
-├── src/
-│   ├── __init__.py
-│   ├── preprocess.py         Data loading, cleaning, scaling, splitting
-│   ├── ml_models.py          RF, XGBoost, SVM, KNN — train + CV evaluation
-│   ├── dl_model.py           PyTorch MLP — StressMLP architecture
-│   └── explainability.py     SHAP wrappers for all model types
-└── README.md
-```
-
----
+**Target** (`sl`): 0 = Low/Normal, 1 = Medium Low, 2 = Medium, 3 = Medium High, 4 = High
 
 ## Models
 
-| Model         | Type | SHAP Method      |
-|---------------|------|------------------|
-| Random Forest | ML   | TreeExplainer    |
-| XGBoost       | ML   | TreeExplainer    |
-| SVM (RBF)     | ML   | KernelExplainer  |
-| KNN           | ML   | KernelExplainer  |
-| MLP (PyTorch) | DL   | DeepExplainer    |
+- **Random Forest** (300 trees)
+- **XGBoost** (300 rounds, depth 6)
+- **SVM (RBF)** (C=10, gamma=scale)
+- **KNN** (k=3, distance-weighted)
+- **MLP (PyTorch)** (64→32→5, BatchNorm, Dropout, CosineAnnealing)
 
----
-
-## Dataset Features
-
-| Column | Description                  |
-|--------|------------------------------|
-| sr     | Snoring Rate                 |
-| rr     | Respiration Rate             |
-| t      | Body Temperature (F)         |
-| lm     | Limb Movement Rate           |
-| bo     | Blood Oxygen (%)             |
-| rem    | Eye Movement (REM)           |
-| sh     | Hours of Sleep               |
-| hr     | Heart Rate (BPM)             |
-| sl     | Stress Level — target (0-4)  |
-
-Stress labels: 0=Low/Normal, 1=Medium Low, 2=Medium, 3=Medium High, 4=High
-
----
-
-## Citation
+## Project Structure
 
 ```
-L. Rachakonda, A. K. Bapatla, S. P. Mohanty, and E. Kougianos,
-"SaYoPillow: Blockchain-Integrated Privacy-Assured IoMT Framework
-for Stress Management Considering Sleeping Habits",
-IEEE Transactions on Consumer Electronics (TCE), Vol. 67, No. 1, Feb 2021, pp. 20-29.
+├── app.py                 # Streamlit web application
+├── train_and_save.py      # Local training script
+├── train_colab.ipynb      # Google Colab training notebook
+├── runtime.txt            # Python 3.12 for Streamlit Cloud
+├── requirements.txt       # Pinned dependencies
+├── data/
+│   └── SaYoPillow.csv     # Dataset (630 samples)
+├── src/
+│   ├── preprocess.py      # Data loading, cleaning, scaling
+│   ├── ml_models.py       # ML model registry & CV evaluation
+│   ├── dl_model.py        # PyTorch MLP
+│   └── explainability.py  # SHAP-based feature importance
+└── models/                # Serialized trained models (generated)
+    ├── random_forest.joblib
+    ├── xgboost.joblib
+    ├── svm_rbf.joblib
+    ├── knn.joblib
+    └── mlp.pt
 ```
+
+## Quick Start
+
+### Option A: Google Colab (Recommended)
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/krishujeniya/stress-level-prediction/blob/main/train_colab.ipynb)
+
+1. Open the Colab notebook
+2. Enter your GitHub PAT (needs `repo` scope)
+3. Run all cells → models train, serialize, and push to GitHub automatically
+
+### Option B: Local
+
+```bash
+pip install -r requirements.txt
+python train_and_save.py
+streamlit run app.py
+```
+
+## Streamlit App
+
+The app loads pre-trained models from `models/` for instant startup on Streamlit Cloud.
+
+**Tabs**:
+- **Predict** — Input biosignals via sliders, get stress prediction with confidence
+- **Model Comparison** — 5-fold CV results, accuracy/F1 bar chart, radar plot
+- **Explainability** — SHAP feature importance for any model
+- **Dataset** — EDA: distributions, correlations, scatter plots
+
+## License
+
+MIT

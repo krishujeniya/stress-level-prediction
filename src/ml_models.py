@@ -1,5 +1,8 @@
 """
 Classical ML models for stress level classification.
+
+Models: Random Forest, XGBoost, SVM (RBF), KNN
+Evaluation: Stratified K-Fold cross-validation
 """
 
 import numpy as np
@@ -42,7 +45,12 @@ MODEL_REGISTRY = {
     ),
 }
 
-def train_all_ml_models(X_train: np.ndarray, y_train: np.ndarray) -> dict:
+
+def train_all_ml_models(
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+) -> dict:
+    """Train all models in MODEL_REGISTRY, return dict[name → fitted model]."""
     trained = {}
     for name, model in MODEL_REGISTRY.items():
         clf = type(model)(**model.get_params())
@@ -50,12 +58,14 @@ def train_all_ml_models(X_train: np.ndarray, y_train: np.ndarray) -> dict:
         trained[name] = clf
     return trained
 
+
 def evaluate_models_cv(
     X: np.ndarray,
     y: np.ndarray,
     n_splits: int = 5,
     random_state: int = 42,
 ) -> pd.DataFrame:
+    """Run stratified K-fold CV on all ML models, return results DataFrame."""
     cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
     scoring = ["accuracy", "f1_macro", "precision_macro", "recall_macro"]
 

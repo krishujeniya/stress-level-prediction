@@ -1,5 +1,11 @@
 """
 Deep learning model: 3-layer MLP using PyTorch.
+
+Architecture: Linear(8→64) → BN → ReLU → Drop →
+              Linear(64→32) → BN → ReLU → Drop →
+              Linear(32→5)
+
+Training: Adam + CosineAnnealing + EarlyStopping (patience=25)
 """
 
 import numpy as np
@@ -7,6 +13,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
+
 
 class StressMLP(nn.Module):
     def __init__(
@@ -33,10 +40,12 @@ class StressMLP(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
+
 def _to_tensor(arr, dtype=torch.float32) -> torch.Tensor:
     if isinstance(arr, np.ndarray):
         return torch.tensor(arr, dtype=dtype)
     return torch.tensor(np.array(arr), dtype=dtype)
+
 
 def train_mlp(
     X_train: np.ndarray,
@@ -49,6 +58,7 @@ def train_mlp(
     weight_decay: float = 1e-4,
     patience: int = 25,
 ) -> StressMLP:
+    """Train MLP with early stopping, return best model."""
     device = torch.device("cpu")
 
     X_tr = _to_tensor(X_train)
@@ -98,7 +108,9 @@ def train_mlp(
         model.load_state_dict(best_state)
     return model
 
+
 def mlp_predict(model: StressMLP, X: np.ndarray):
+    """Return (predictions, probabilities) arrays."""
     model.eval()
     with torch.no_grad():
         logits = model(_to_tensor(X))
@@ -106,7 +118,9 @@ def mlp_predict(model: StressMLP, X: np.ndarray):
         preds = proba.argmax(axis=1)
     return preds, proba
 
+
 def mlp_predict_proba(model: StressMLP, X) -> np.ndarray:
+    """Return probability matrix."""
     model.eval()
     with torch.no_grad():
         X_t = _to_tensor(np.array(X, dtype=np.float32))

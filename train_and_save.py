@@ -1,6 +1,7 @@
 """
-Run locally once to generate serialized models, then commit the models/ folder.
-This eliminates cold-start training on Streamlit Cloud.
+One-time local training script.
+Run: python train_and_save.py
+Then commit the models/ folder.
 """
 
 import os
