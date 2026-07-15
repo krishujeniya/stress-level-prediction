@@ -63,9 +63,10 @@ Five-class physiological stress classifier trained on biosignals captured during
 ### Option B: Local
 
 ```bash
-pip install -r requirements.txt
-python train_and_save.py
-streamlit run app.py
+uv venv
+uv pip install -r requirements.txt
+uv run python train_and_save.py
+uv run streamlit run app.py
 ```
 
 ## Streamlit App

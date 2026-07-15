@@ -32,6 +32,17 @@ FEATURE_DISPLAY = {
     "hr": "Heart Rate (BPM)",
 }
 
+FEATURE_DESC = {
+    "sr": "Acoustic measurement of snoring frequency. Elevated rates often correlate with sleep apnea or elevated stress.",
+    "rr": "Number of breaths per minute. Higher rates during sleep indicate sympathetic nervous system arousal.",
+    "t": "Core body temperature. Should drop slightly during deep sleep; elevated temps disrupt sleep architecture.",
+    "lm": "Frequency of limb twitches. Restless legs or high movement indicates fragmented, non-restorative sleep.",
+    "bo": "SpO2 levels. Drops in oxygen saturation trigger cortisol release, indicating high physiological stress.",
+    "rem": "Rapid Eye Movement phase duration. Essential for cognitive recovery; stress often suppresses REM sleep.",
+    "sh": "Total continuous hours of sleep recorded. Acute deprivation directly elevates daytime stress markers.",
+    "hr": "Resting heart rate in BPM. Elevated nocturnal heart rate is a primary indicator of physiological strain.",
+}
+
 LABEL_MAP = {
     0: "Low / Normal",
     1: "Medium Low",
@@ -41,11 +52,11 @@ LABEL_MAP = {
 }
 
 STRESS_COLORS = {
-    0: "#2d6a4f",
-    1: "#74c69d",
-    2: "#f4a261",
-    3: "#e76f51",
-    4: "#c1121f",
+    0: "#ffffff",
+    1: "#d4d4d8",
+    2: "#a1a1aa",
+    3: "#71717a",
+    4: "#3f3f46",
 }
 
 # (min, max, default, step) for Streamlit sliders

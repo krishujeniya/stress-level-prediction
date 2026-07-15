@@ -23,6 +23,7 @@ from src.preprocess import (
     load_and_prepare,
     FEATURE_COLS,
     FEATURE_DISPLAY,
+    FEATURE_DESC,
     FEATURE_RANGES,
     LABEL_MAP,
     STRESS_COLORS,
@@ -35,6 +36,87 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+st.markdown("""
+<style>
+/* Font setup */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Base App Background - Dark sleek gradient */
+.stApp {
+    background: linear-gradient(135deg, #050505 0%, #171717 100%);
+    color: #fafafa;
+}
+
+/* Glassmorphism Containers */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    background: rgba(255,255,255,0.02);
+    padding: 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #a1a1aa !important;
+    font-weight: 500;
+}
+
+.stTabs [aria-selected="true"] {
+    background: rgba(255,255,255,0.1) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Glassmorphic Metrics */
+div[data-testid="metric-container"] {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+/* Headers and text */
+h1, h2, h3, h4, h5, h6, p, span, label {
+    color: #fafafa !important;
+}
+
+/* Primary Button */
+.stButton button {
+    background: linear-gradient(to right, #ffffff, #a1a1aa) !important;
+    color: #050505 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+    box-shadow: 0 4px 14px 0 rgba(255,255,255,0.1) !important;
+    transition: all 0.2s ease !important;
+}
+.stButton button p, .stButton button span, .stButton button div {
+    color: #000000 !important;
+}
+.stButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,255,255,0.15) !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background: rgba(255,255,255,0.03) !important;
+    border-radius: 8px !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ─── Stress reduction tips ────────────────────────────────────────────────────
 REDUCTION_TIPS = {
@@ -127,17 +209,17 @@ except Exception as e:
 # ─── Hero ─────────────────────────────────────────────────────────────────────
 st.markdown(
     """
-    <div style="text-align:center; margin-bottom:1.5rem;">
-        <h1 style="font-family:'IBM Plex Mono',monospace; font-weight:700; color:#0a0a0a;">
+    <div style="text-align:center; margin-bottom:2.5rem; padding:3rem; background:rgba(255,255,255,0.02); border-radius:16px; border:1px solid rgba(255,255,255,0.05); backdrop-filter:blur(10px);">
+        <h1 style="font-family:'Inter',sans-serif; font-weight:700; color:#ffffff; font-size: 3rem; margin-bottom:1rem; letter-spacing:-1px;">
             Stress Level Prediction
         </h1>
-        <p style="color:#555; max-width:700px; margin:auto;">
+        <p style="color:#a1a1aa; max-width:700px; margin:auto; font-size:1.1rem; line-height:1.6;">
             Five-class physiological stress classifier trained on biosignals captured during sleep.
             Predicts stress level from snoring rate, respiration, body temperature,
             limb movement, blood oxygen, eye movement, sleep duration, and heart rate.
         </p>
-        <p style="font-size:0.85rem; color:#888; margin-top:0.5rem;">
-            Dataset: SaYoPillow — Rachakonda et al., IEEE TCE 2021
+        <p style="font-size:0.85rem; color:#52525b; margin-top:1.5rem; font-weight:500; text-transform:uppercase; letter-spacing:1px;">
+            Dataset: SaYoPillow (Rachakonda et al., IEEE TCE 2021)
         </p>
     </div>
     """,
@@ -145,8 +227,8 @@ st.markdown(
 )
 
 # ─── Tabs ─────────────────────────────────────────────────────────────────────
-tab_predict, tab_compare, tab_explain, tab_data = st.tabs(
-    ["Predict", "Model Comparison", "Explainability", "Dataset"]
+tab_predict, tab_compare, tab_data = st.tabs(
+    ["Predict", "Model Comparison", "Dataset"]
 )
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -165,17 +247,17 @@ with tab_predict:
 
     with col_left:
         st.markdown('<p style="font-weight:600;">Sleep Metrics</p>', unsafe_allow_html=True)
-        sh_val = st.slider(FEATURE_DISPLAY["sh"], *FEATURE_RANGES["sh"])
-        rem_val = st.slider(FEATURE_DISPLAY["rem"], *FEATURE_RANGES["rem"])
-        sr_val = st.slider(FEATURE_DISPLAY["sr"], *FEATURE_RANGES["sr"])
-        lm_val = st.slider(FEATURE_DISPLAY["lm"], *FEATURE_RANGES["lm"])
+        sh_val = st.slider(FEATURE_DISPLAY["sh"], *FEATURE_RANGES["sh"], help=FEATURE_DESC["sh"])
+        rem_val = st.slider(FEATURE_DISPLAY["rem"], *FEATURE_RANGES["rem"], help=FEATURE_DESC["rem"])
+        sr_val = st.slider(FEATURE_DISPLAY["sr"], *FEATURE_RANGES["sr"], help=FEATURE_DESC["sr"])
+        lm_val = st.slider(FEATURE_DISPLAY["lm"], *FEATURE_RANGES["lm"], help=FEATURE_DESC["lm"])
 
     with col_right:
         st.markdown('<p style="font-weight:600;">Physiological Metrics</p>', unsafe_allow_html=True)
-        rr_val = st.slider(FEATURE_DISPLAY["rr"], *FEATURE_RANGES["rr"])
-        t_val = st.slider(FEATURE_DISPLAY["t"], *FEATURE_RANGES["t"])
-        bo_val = st.slider(FEATURE_DISPLAY["bo"], *FEATURE_RANGES["bo"])
-        hr_val = st.slider(FEATURE_DISPLAY["hr"], *FEATURE_RANGES["hr"])
+        rr_val = st.slider(FEATURE_DISPLAY["rr"], *FEATURE_RANGES["rr"], help=FEATURE_DESC["rr"])
+        t_val = st.slider(FEATURE_DISPLAY["t"], *FEATURE_RANGES["t"], help=FEATURE_DESC["t"])
+        bo_val = st.slider(FEATURE_DISPLAY["bo"], *FEATURE_RANGES["bo"], help=FEATURE_DESC["bo"])
+        hr_val = st.slider(FEATURE_DISPLAY["hr"], *FEATURE_RANGES["hr"], help=FEATURE_DESC["hr"])
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -196,12 +278,13 @@ with tab_predict:
 
         st.markdown(
             f"""
-            <div style="background:{color}15; border-left:5px solid {color};
-                        padding:1rem 1.5rem; border-radius:6px; margin:1rem 0;">
-                <h3 style="margin:0; color:{color};">{label}</h3>
-                <p style="margin:0.25rem 0 0; color:#444; font-size:0.9rem;">
-                    Stress class {pred_class} · Model: {selected_model_name} ·
-                    Confidence: {confidence[pred_class]*100:.1f}%
+            <div style="background:rgba(255,255,255,0.03); border-left:4px solid {{color}};
+                        padding:1.5rem; border-radius:8px; margin:1.5rem 0;
+                        backdrop-filter:blur(10px); border-right:1px solid rgba(255,255,255,0.05); border-top:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05);">
+                <h3 style="margin:0; color:{{color}}; font-weight:600; letter-spacing:-0.5px;">{{label}}</h3>
+                <p style="margin:0.5rem 0 0; color:#a1a1aa; font-size:0.95rem;">
+                    Stress class {{pred_class}} &middot; Model: {{selected_model_name}} &middot;
+                    Confidence: <span style="color:#fafafa; font-weight:600;">{{confidence[pred_class]*100:.1f}}%</span>
                 </p>
             </div>
             """,
@@ -216,17 +299,18 @@ with tab_predict:
             textposition="outside",
         ))
         fig.update_layout(
-            title=dict(text="Prediction Confidence", font=dict(size=13, family="IBM Plex Mono")),
-            yaxis=dict(title="Confidence (%)", range=[0, 115]),
-            xaxis_title="", plot_bgcolor="#fff", paper_bgcolor="#fff",
+            title=dict(text="Prediction Confidence", font=dict(size=14, family="Inter", color="#fafafa")),
+            yaxis=dict(title="Confidence (%)", range=[0, 115], gridcolor="rgba(255,255,255,0.05)", zerolinecolor="rgba(255,255,255,0.05)", color="#a1a1aa"),
+            xaxis=dict(color="#a1a1aa"),
+            plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
             margin=dict(t=40, b=20, l=10, r=10), height=320,
-            font=dict(family="IBM Plex Sans"),
+            font=dict(family="Inter", color="#e4e4e7"),
         )
         st.plotly_chart(fig, use_container_width=True)
 
-        st.markdown('<p style="font-weight:600; margin-top:1rem;">Recommendations</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-weight:600; margin-top:1rem; color:#fafafa;">Recommendations</p>', unsafe_allow_html=True)
         for tip in REDUCTION_TIPS[pred_class]:
-            st.markdown(f"• {tip}")
+            st.markdown(f"<span style='color:#a1a1aa;'>&bull; {tip}</span>", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 2 — Model Comparison
@@ -237,67 +321,61 @@ with tab_compare:
 
     from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-    mlp_preds, _ = mlp_predict(all_models["MLP (PyTorch)"], data["X_test"])
+    mlp_train_preds, _ = mlp_predict(all_models["MLP (PyTorch)"], data["X_train"])
+    mlp_test_preds, _ = mlp_predict(all_models["MLP (PyTorch)"], data["X_test"])
+    
+    mlp_train_acc = round(accuracy_score(data["y_train"], mlp_train_preds), 4)
+    mlp_test_acc = round(accuracy_score(data["y_test"], mlp_test_preds), 4)
+    
+    if mlp_train_acc - mlp_test_acc > 0.05:
+        fit_status = "Overfit"
+    elif mlp_train_acc < 0.85 and mlp_test_acc < 0.85:
+        fit_status = "Underfit"
+    else:
+        fit_status = "Optimal"
+        
     mlp_row = {
         "Model": "MLP (PyTorch)",
-        "Accuracy Mean": round(accuracy_score(data["y_test"], mlp_preds), 4),
-        "Accuracy Std": "—",
-        "F1 Macro Mean": round(f1_score(data["y_test"], mlp_preds, average="macro"), 4),
-        "F1 Macro Std": "—",
-        "Precision Mean": round(precision_score(data["y_test"], mlp_preds, average="macro"), 4),
-        "Precision Std": "—",
-        "Recall Mean": round(recall_score(data["y_test"], mlp_preds, average="macro"), 4),
-        "Recall Std": "—",
+        "Train Accuracy": mlp_train_acc,
+        "Test Accuracy": mlp_test_acc,
+        "Train F1 Macro": round(f1_score(data["y_train"], mlp_train_preds, average="macro"), 4),
+        "Test F1 Macro": round(f1_score(data["y_test"], mlp_test_preds, average="macro"), 4),
+        "Train Precision": round(precision_score(data["y_train"], mlp_train_preds, average="macro"), 4),
+        "Test Precision": round(precision_score(data["y_test"], mlp_test_preds, average="macro"), 4),
+        "Train Recall": round(recall_score(data["y_train"], mlp_train_preds, average="macro"), 4),
+        "Test Recall": round(recall_score(data["y_test"], mlp_test_preds, average="macro"), 4),
+        "Fit Status": fit_status
     }
     display_df = pd.concat([cv_results, pd.DataFrame([mlp_row])], ignore_index=True)
-    best_idx = display_df["Accuracy Mean"].idxmax()
+    best_idx = display_df["Test Accuracy"].idxmax()
 
     st.dataframe(display_df.set_index("Model"), use_container_width=True)
-    st.caption(f"Best: {display_df.loc[best_idx, 'Model']} ({display_df.loc[best_idx, 'Accuracy Mean']:.4f})")
+    st.caption(f"Best: {display_df.loc[best_idx, 'Model']} ({display_df.loc[best_idx, 'Test Accuracy']:.4f})")
 
     # Bar chart
     fig_bar = go.Figure()
-    for col, color in [("Accuracy Mean", "#0a0a0a"), ("F1 Macro Mean", "#888")]:
+    for col, color in [("Test Accuracy", "#ffffff"), ("Test F1 Macro", "#d4d4d8"), ("Test Precision", "#a1a1aa"), ("Test Recall", "#71717a")]:
         vals = pd.to_numeric(display_df[col], errors="coerce")
         fig_bar.add_trace(go.Bar(
-            name=col.replace(" Mean", ""), x=display_df["Model"], y=vals,
+            name=col.replace("Test ", ""), x=display_df["Model"], y=vals,
             marker_color=color,
             text=[f"{v:.3f}" if not np.isnan(v) else "" for v in vals],
             textposition="outside",
         ))
     fig_bar.update_layout(
-        barmode="group", yaxis=dict(range=[0.8, 1.05], title="Score"),
-        plot_bgcolor="#fff", paper_bgcolor="#fff",
-        legend=dict(orientation="h", y=1.12), margin=dict(t=30, b=10),
-        height=380, font=dict(family="IBM Plex Sans", size=12),
+        barmode="group", yaxis=dict(range=[0.8, 1.05], title="Score", gridcolor="rgba(255,255,255,0.05)", zerolinecolor="rgba(255,255,255,0.05)", color="#a1a1aa"),
+        xaxis=dict(color="#a1a1aa"),
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        legend=dict(orientation="h", y=1.12, font=dict(color="#a1a1aa")), margin=dict(t=30, b=10),
+        height=380, font=dict(family="Inter", color="#e4e4e7"),
     )
     st.plotly_chart(fig_bar, use_container_width=True)
 
-    # Radar
-    ml_df = display_df[display_df["Model"] != "MLP (PyTorch)"].copy()
-    metrics = ["Accuracy Mean", "F1 Macro Mean", "Precision Mean", "Recall Mean"]
-    met_disp = ["Accuracy", "F1 Macro", "Precision", "Recall"]
 
-    fig_radar = go.Figure()
-    for _, row in ml_df.iterrows():
-        vals = [float(row[m]) for m in metrics]
-        fig_radar.add_trace(go.Scatterpolar(
-            r=vals + [vals[0]], theta=met_disp + [met_disp[0]],
-            name=row["Model"], fill="toself", opacity=0.4,
-        ))
-    fig_radar.update_layout(
-        polar=dict(radialaxis=dict(visible=True, range=[0.9, 1.0])),
-        showlegend=True, height=420, font=dict(family="IBM Plex Sans"),
-        margin=dict(t=30, b=10),
-    )
-    st.markdown('<p style="font-weight:600;">Radar — ML Models</p>', unsafe_allow_html=True)
-    st.plotly_chart(fig_radar, use_container_width=True)
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TAB 3 — Explainability
-# ═══════════════════════════════════════════════════════════════════════════════
-with tab_explain:
-    st.markdown("<br>", unsafe_allow_html=True)
+    # ═══════════════════════════════════════════════════════════════════════════════
+    # Explainability Section
+    # ═══════════════════════════════════════════════════════════════════════════════
+    st.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 3rem 0;'>", unsafe_allow_html=True)
     st.markdown('<p style="font-weight:600;">SHAP Feature Importance</p>', unsafe_allow_html=True)
 
     explain_name = st.selectbox("Model to explain", list(all_models.keys()), key="explain_sel")
@@ -314,15 +392,16 @@ with tab_explain:
 
         fig_shap = go.Figure(go.Bar(
             x=importance[order], y=[feat_labels[i] for i in order],
-            orientation="h", marker_color="#0a0a0a",
+            orientation="h", marker_color="#ffffff",
             text=[f"{v:.4f}" for v in importance[order]], textposition="outside",
         ))
         fig_shap.update_layout(
-            title=dict(text=f"Mean |SHAP| — {explain_name}", font=dict(family="IBM Plex Mono", size=12)),
-            xaxis_title="Mean |SHAP value|", yaxis_title="",
-            plot_bgcolor="#fff", paper_bgcolor="#fff",
+            title=dict(text=f"Mean |SHAP| - {explain_name}", font=dict(family="Inter", size=14, color="#fafafa")),
+            xaxis=dict(title="Mean |SHAP value|", gridcolor="rgba(255,255,255,0.05)", zerolinecolor="rgba(255,255,255,0.05)", color="#a1a1aa"),
+            yaxis=dict(title="", color="#a1a1aa"),
+            plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
             margin=dict(t=40, b=10, l=10, r=80), height=380,
-            font=dict(family="IBM Plex Sans", size=12),
+            font=dict(family="Inter", color="#e4e4e7"),
         )
         st.plotly_chart(fig_shap, use_container_width=True)
         st.caption("REM and blood oxygen typically rank highest per literature.")
@@ -343,48 +422,20 @@ with tab_data:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Class distribution
-    st.markdown('<p style="font-weight:600;">Class Distribution</p>', unsafe_allow_html=True)
-    cc = df["sl"].value_counts().sort_index()
-    fig_dist = go.Figure(go.Bar(
-        x=[LABEL_MAP[i] for i in cc.index], y=cc.values,
-        marker_color=[STRESS_COLORS[i] for i in cc.index],
-        text=cc.values, textposition="outside",
-    ))
-    fig_dist.update_layout(
-        yaxis_title="Count", plot_bgcolor="#fff", paper_bgcolor="#fff",
-        margin=dict(t=10, b=10), height=300, font=dict(family="IBM Plex Sans", size=12),
-    )
-    st.plotly_chart(fig_dist, use_container_width=True)
 
-    # Box plot
-    st.markdown('<p style="font-weight:600;">Feature Distribution by Stress Level</p>', unsafe_allow_html=True)
-    sel_feat = st.selectbox("Feature", FEATURE_COLS, format_func=lambda x: FEATURE_DISPLAY[x], key="dist_f")
-
-    fig_box = go.Figure()
-    for lev in sorted(df["sl"].unique()):
-        fig_box.add_trace(go.Box(
-            y=df[df["sl"] == lev][sel_feat], name=LABEL_MAP[lev],
-            marker_color=STRESS_COLORS[lev], boxmean=True,
-        ))
-    fig_box.update_layout(
-        yaxis_title=FEATURE_DISPLAY[sel_feat], plot_bgcolor="#fff", paper_bgcolor="#fff",
-        margin=dict(t=10, b=10), height=360, font=dict(family="IBM Plex Sans", size=12),
-        showlegend=False,
-    )
-    st.plotly_chart(fig_box, use_container_width=True)
 
     # Correlation
     st.markdown('<p style="font-weight:600;">Pearson Correlation Matrix</p>', unsafe_allow_html=True)
     corr = df[FEATURE_COLS].corr()
     fl = [FEATURE_DISPLAY[f] for f in FEATURE_COLS]
     fig_corr = go.Figure(go.Heatmap(
-        z=corr.values, x=fl, y=fl, colorscale="RdBu", zmid=0, zmin=-1, zmax=1,
+        z=corr.values, x=fl, y=fl, colorscale="Greys", zmid=0, zmin=-1, zmax=1,
         text=np.round(corr.values, 2), texttemplate="%{text}", showscale=True,
     ))
     fig_corr.update_layout(
-        plot_bgcolor="#fff", paper_bgcolor="#fff",
-        margin=dict(t=10, b=10), height=460, font=dict(family="IBM Plex Sans", size=11),
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=10, b=10), height=460, font=dict(family="Inter", size=11, color="#e4e4e7"),
+        xaxis=dict(color="#a1a1aa"), yaxis=dict(color="#a1a1aa"),
     )
     st.plotly_chart(fig_corr, use_container_width=True)
 
@@ -400,11 +451,14 @@ with tab_data:
         df, x=fx, y=fy, color=df["sl"].map(LABEL_MAP),
         color_discrete_map={LABEL_MAP[k]: STRESS_COLORS[k] for k in STRESS_COLORS},
         labels={"x": FEATURE_DISPLAY[fx], "y": FEATURE_DISPLAY[fy], "color": "Stress Level"},
-        opacity=0.7,
+        opacity=0.8,
     )
     fig_sc.update_layout(
-        plot_bgcolor="#fff", paper_bgcolor="#fff",
-        margin=dict(t=10, b=10), height=380, font=dict(family="IBM Plex Sans", size=12),
+        xaxis=dict(gridcolor="rgba(255,255,255,0.05)", zerolinecolor="rgba(255,255,255,0.05)", color="#a1a1aa"),
+        yaxis=dict(gridcolor="rgba(255,255,255,0.05)", zerolinecolor="rgba(255,255,255,0.05)", color="#a1a1aa"),
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        margin=dict(t=10, b=10), height=380, font=dict(family="Inter", color="#e4e4e7"),
+        legend=dict(font=dict(color="#a1a1aa")),
     )
     st.plotly_chart(fig_sc, use_container_width=True)
 

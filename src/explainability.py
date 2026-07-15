@@ -55,4 +55,11 @@ def compute_shap_importance(
         shap_values = explainer.shap_values(sample, nsamples=80, silent=True)
         mean_abs = np.mean([np.abs(sv) for sv in shap_values], axis=(0, 1))
 
+    # Ensure mean_abs is 1D (n_features,)
+    if mean_abs.ndim > 1:
+        if mean_abs.shape[0] == X_train.shape[1]:
+            mean_abs = mean_abs.mean(axis=1)
+        else:
+            mean_abs = mean_abs.mean(axis=0)
+
     return mean_abs

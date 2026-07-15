@@ -72,13 +72,23 @@ def evaluate_models_cv(
     records = []
     for name, model in MODEL_REGISTRY.items():
         clf = type(model)(**model.get_params())
-        results = cross_validate(clf, X, y, cv=cv, scoring=scoring, n_jobs=-1)
+        results = cross_validate(clf, X, y, cv=cv, scoring=scoring, return_train_score=True, n_jobs=-1)
         record = {"Model": name}
         for metric in scoring:
-            key = f"test_{metric}"
             label = metric.replace("_macro", "").replace("_", " ").title()
-            record[f"{label} Mean"] = round(results[key].mean(), 4)
-            record[f"{label} Std"] = round(results[key].std(), 4)
+            record[f"Train {label}"] = round(results[f"train_{metric}"].mean(), 4)
+            record[f"Test {label}"] = round(results[f"test_{metric}"].mean(), 4)
+            
+        train_acc = record["Train Accuracy"]
+        test_acc = record["Test Accuracy"]
+        
+        if train_acc - test_acc > 0.05:
+            record["Fit Status"] = "Overfit"
+        elif train_acc < 0.85 and test_acc < 0.85:
+            record["Fit Status"] = "Underfit"
+        else:
+            record["Fit Status"] = "Optimal"
+            
         records.append(record)
 
     return pd.DataFrame(records)
