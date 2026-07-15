@@ -115,6 +115,35 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     background: rgba(255,255,255,0.03) !important;
     border-radius: 8px !important;
 }
+
+/* --- Mobile First Optimizations --- */
+@media (max-width: 768px) {
+    .stApp {
+        padding-top: 1rem !important;
+    }
+    /* Stack tabs vertically for large touch targets on mobile */
+    .stTabs [data-baseweb="tab-list"] {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        width: 100%;
+        text-align: center;
+        padding: 12px;
+        font-size: 1rem;
+        border-radius: 6px;
+    }
+    /* Compress metric paddings */
+    div[data-testid="metric-container"] {
+        padding: 10px;
+    }
+    /* Ensure Plotly charts don't overflow */
+    .js-plotly-plot {
+        max-width: 100vw !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
