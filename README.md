@@ -1,4 +1,4 @@
-# Stress Level Prediction (AI Engineering Dashboard)
+# Stress Level Prediction
 
 A high-performance, five-class physiological stress classifier trained on biosignals captured during sleep. This project features a premium, glassmorphic Streamlit dashboard tailored for AI engineers, complete with advanced model diagnostics and SHAP explainability.
 
