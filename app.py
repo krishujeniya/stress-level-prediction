@@ -278,13 +278,13 @@ with tab_predict:
 
         st.markdown(
             f"""
-            <div style="background:rgba(255,255,255,0.03); border-left:4px solid {{color}};
+            <div style="background:rgba(255,255,255,0.03); border-left:4px solid {color};
                         padding:1.5rem; border-radius:8px; margin:1.5rem 0;
                         backdrop-filter:blur(10px); border-right:1px solid rgba(255,255,255,0.05); border-top:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05);">
-                <h3 style="margin:0; color:{{color}}; font-weight:600; letter-spacing:-0.5px;">{{label}}</h3>
+                <h3 style="margin:0; color:{color}; font-weight:600; letter-spacing:-0.5px;">{label}</h3>
                 <p style="margin:0.5rem 0 0; color:#a1a1aa; font-size:0.95rem;">
-                    Stress class {{pred_class}} &middot; Model: {{selected_model_name}} &middot;
-                    Confidence: <span style="color:#fafafa; font-weight:600;">{{confidence[pred_class]*100:.1f}}%</span>
+                    Stress class {pred_class} &middot; Model: {selected_model_name} &middot;
+                    Confidence: <span style="color:#fafafa; font-weight:600;">{confidence[pred_class]*100:.1f}%</span>
                 </p>
             </div>
             """,
