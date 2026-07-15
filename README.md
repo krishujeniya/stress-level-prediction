@@ -1,10 +1,10 @@
-# Stress Level Prediction
+# Stress Level Prediction (AI Engineering Dashboard)
 
-Five-class physiological stress classifier trained on biosignals captured during sleep.
+A high-performance, five-class physiological stress classifier trained on biosignals captured during sleep. This project features a premium, glassmorphic Streamlit dashboard tailored for AI engineers, complete with advanced model diagnostics and SHAP explainability.
 
 **Dataset**: [SaYoPillow](https://www.kaggle.com/datasets/laavanya/stress-level-prediction) — Rachakonda et al., IEEE Transactions on Consumer Electronics, 2021
 
-## Features
+## Features & Biosignals
 
 | Code | Feature | Unit |
 |------|---------|------|
@@ -19,7 +19,7 @@ Five-class physiological stress classifier trained on biosignals captured during
 
 **Target** (`sl`): 0 = Low/Normal, 1 = Medium Low, 2 = Medium, 3 = Medium High, 4 = High
 
-## Models
+## Evaluated Models
 
 - **Random Forest** (300 trees)
 - **XGBoost** (300 rounds, depth 6)
@@ -30,37 +30,24 @@ Five-class physiological stress classifier trained on biosignals captured during
 ## Project Structure
 
 ```
-├── app.py                 # Streamlit web application
+├── app.py                 # Streamlit web application (Glassmorphic UI)
 ├── train_and_save.py      # Local training script
-├── train_colab.ipynb      # Google Colab training notebook
+├── train_colab.ipynb      # Sanitized Google Colab training notebook
 ├── runtime.txt            # Python 3.12 for Streamlit Cloud
 ├── requirements.txt       # Pinned dependencies
 ├── data/
 │   └── SaYoPillow.csv     # Dataset (630 samples)
 ├── src/
-│   ├── preprocess.py      # Data loading, cleaning, scaling
-│   ├── ml_models.py       # ML model registry & CV evaluation
+│   ├── preprocess.py      # Data loading, cleaning, scaling, tooltips
+│   ├── ml_models.py       # ML model registry & cross-validation metrics
 │   ├── dl_model.py        # PyTorch MLP
 │   └── explainability.py  # SHAP-based feature importance
 └── models/                # Serialized trained models (generated)
-    ├── random_forest.joblib
-    ├── xgboost.joblib
-    ├── svm_rbf.joblib
-    ├── knn.joblib
-    └── mlp.pt
 ```
 
-## Quick Start
+## Quick Start (Local with `uv`)
 
-### Option A: Google Colab (Recommended)
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/krishujeniya/stress-level-prediction/blob/main/train_colab.ipynb)
-
-1. Open the Colab notebook
-2. Enter your GitHub PAT (needs `repo` scope)
-3. Run all cells → models train, serialize, and push to GitHub automatically
-
-### Option B: Local
+This project uses the extremely fast `uv` package manager for Python.
 
 ```bash
 uv venv
@@ -69,15 +56,17 @@ uv run python train_and_save.py
 uv run streamlit run app.py
 ```
 
-## Streamlit App
+## Dashboard Features
 
-The app loads pre-trained models from `models/` for instant startup on Streamlit Cloud.
+The Streamlit app has been ruthlessly optimized for an AI engineering workflow, stripping away univariate clutter and focusing strictly on multivariate analysis and model performance.
 
-**Tabs**:
-- **Predict** — Input biosignals via sliders, get stress prediction with confidence
-- **Model Comparison** — 5-fold CV results, accuracy/F1 bar chart, radar plot
-- **Explainability** — SHAP feature importance for any model
-- **Dataset** — EDA: distributions, correlations, scatter plots
+- **Predict** — Input biosignals via intuitive sliders with embedded scientific tooltips (`?`).
+- **Model Comparison** — View comprehensive Train/Test evaluation metrics (Accuracy, Precision, Recall, F1) alongside automatic **Fit Status** classification (Underfit, Optimal, Overfit). It also includes dynamically rendered SHAP feature importance charts.
+- **Dataset** — Minimalist EDA focusing strictly on high-level data topology and a Pearson Correlation Matrix.
+
+## Google Colab
+
+The repository includes a pristine, privacy-first `train_colab.ipynb` notebook. It is strictly scoped to loading the dataset, executing the PyTorch/XGBoost training loops, and serializing the artifacts without any external deployment bloat.
 
 ## License
 
